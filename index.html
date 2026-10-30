@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Para mi Princesa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Dancing+Script:wght@500;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        suppressWarnings: true,
+        theme: {
+            extend: {
+                colors: {
+                    cream: '#FFFDF9',
+                    blush: '#FCE7F0',
+                    rosewood: '#6B2D3E',
+                    gold: '#D4AF37',
+                    softPink: '#F8C8DC',
+                    deepWine: '#4A1525',
+                },
+                fontFamily: {
+                    dancing: ['"Dancing Script"', 'cursive'],
+                    playfair: ['"Playfair Display"', 'serif'],
+                    montserrat: ['"Montserrat"', 'sans-serif'],
+                }
+            }
+        }
+    }
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { background: linear-gradient(180deg,#FFFDF9 0%,#FCE7F0 100%); color:#6B2D3E; font-family:Montserrat,sans-serif; min-height:100vh; overflow-x:hidden; }
+  .petal { position:fixed; top:-40px; z-index:1; pointer-events:none; border-radius:150% 0 150% 0; opacity:.8; background:linear-gradient(135deg,#F8C8DC,#c9577c); animation:fall linear infinite; }
+  @keyframes fall { 0%{transform:translate3d(0,-5vh,0) rotate(0)} 50%{transform:translate3d(60px,55vh,0) rotate(200deg)} 100%{transform:translate3d(-30px,110vh,0) rotate(400deg)} }
+  .content { position:relative; z-index:2; }
+  .gold-line { height:1px; width:140px; margin:1.5rem auto; background:linear-gradient(90deg,transparent,#D4AF37,transparent); }
+  .letter { background:#FFFDF9; border:1px solid rgba(212,175,55,.5); box-shadow:0 20px 50px rgba(107,45,62,.12); }
+  .letter p { margin-bottom:1.2rem; line-height:1.9; }
+  .card { background:#FFFDF9; border:1px solid rgba(212,175,55,.45); transition:transform .3s, box-shadow .3s; }
+  .card:hover { transform:translateY(-4px); box-shadow:0 14px 30px rgba(107,45,62,.15); }
+  .btn { padding:.95rem 2rem; border-radius:999px; font-weight:500; transition:transform .2s; }
+  .btn:hover { transform:translateY(-2px); }
+  .btn:disabled { opacity:.6; cursor:wait; }
+  .btn-yes { background:#6B2D3E; color:#FFFDF9; box-shadow:0 8px 20px rgba(107,45,62,.3); }
+  .btn-wait { background:transparent; color:#6B2D3E; border:1.5px solid #D4AF37; }
+  .modal { position:fixed; inset:0; z-index:60; display:none; align-items:center; justify-content:center; padding:1.5rem; background:rgba(74,21,37,.6); backdrop-filter:blur(4px); }
+  .modal.show { display:flex; }
+  .modal-box { background:#FFFDF9; border:2px solid #D4AF37; border-radius:1.5rem; max-width:30rem; padding:2.5rem 2rem; text-align:center; animation:pop .4s ease; }
+  @keyframes pop { from{transform:scale(.85);opacity:0} to{transform:scale(1);opacity:1} }
+  .fx { position:fixed; top:-30px; z-index:70; pointer-events:none; animation:confetti linear forwards; }
+  @keyframes confetti { to { transform:translate3d(var(--dx),110vh,0) rotate(720deg); } }
+  .fab { position:fixed; z-index:50; width:3rem; height:3rem; border-radius:50%; background:#6B2D3E; color:#FFFDF9; border:2px solid #D4AF37; box-shadow:0 6px 16px rgba(0,0,0,.2); }
+  .panel { position:fixed; right:1rem; bottom:5rem; z-index:50; width:min(22rem,calc(100vw - 2rem)); background:#FFFDF9; border:1px solid #D4AF37; border-radius:1rem; padding:1.25rem; box-shadow:0 14px 40px rgba(0,0,0,.2); display:none; font-size:.85rem; }
+  .panel.show { display:block; }
+  .panel input { width:100%; border:1px solid #D4AF37; border-radius:.5rem; padding:.5rem .7rem; margin:.25rem 0 .75rem; background:#fff; color:#6B2D3E; }
+  #ytWrap { position:fixed; bottom:0; left:0; width:2px; height:2px; opacity:0; pointer-events:none; overflow:hidden; }
+  :focus-visible { outline:2px solid #D4AF37; outline-offset:2px; }
+  @media (prefers-reduced-motion: reduce) { .petal { animation-duration:30s !important; } }
+</style>
+</head>
+<body>
+
+<button id="banner" class="content w-full py-3 px-4 text-sm md:text-base font-medium bg-rosewood text-cream border-b-2 border-gold">
+  Toca aquí para activar la canción 🎵 Bryan Adams - Heaven
+</button>
+
+<button id="musicBtn" class="fab" style="top:4.25rem;right:1rem" aria-label="Reproducir o pausar la música"><i class="fa-solid fa-play"></i></button>
+<div id="ytWrap"><div id="ytPlayer"></div></div>
+
+<main class="content max-w-3xl mx-auto px-5 pb-24">
+
+  <header class="text-center pt-14 pb-6">
+    <i class="fa-solid fa-heart text-gold text-2xl mb-4"></i>
+    <h1 class="font-playfair font-bold text-4xl md:text-6xl leading-tight">Para el amor de mi vida: <span class="font-dancing font-bold text-5xl md:text-7xl block mt-2">Mi Princesa</span></h1>
+    <div class="gold-line"></div>
+    <p class="font-playfair italic text-lg md:text-xl max-w-xl mx-auto leading-relaxed">No hay un solo segundo en el que no piense en lo valiosa que eres para mí y en lo mucho que me duele haberte fallado.</p>
+  </header>
+
+  <section class="letter rounded-2xl p-7 md:p-12 my-10" aria-label="Carta de perdón">
+    <h2 class="font-dancing text-4xl text-center mb-6">Una carta para ti</h2>
+    <p>Sé que las palabras no borran las equivocaciones, pero quiero expresarte desde la honestidad más profunda lo mucho que lamento lo sucedido. Me dolió haber causado esa distancia entre nosotros y perturbar la paz de nuestra relación y de tu corazón.</p>
+    <p>Eres la persona que ilumina mis días, mi compañera y mi mayor bendición. Reconozco mi falta de madurez en ese momento y entiendo perfectamente por qué estás molesta. Tu tranquilidad y tu felicidad son lo más importante para mí, y me pesa enormemente saber que fui la causa de tu tristeza.</p>
+    <p>No quiero poner excusas. Solo quiero pedirte perdón de corazón y asegurarte que estoy dispuesto a aprender, escuchar y cambiar lo que sea necesario para cuidar de ti y de nuestra relación como te mereces.</p>
+    <p class="font-dancing text-3xl text-right mt-8 mb-0">Con todo mi amor y arrepentimiento,<br>Tu novio</p>
+  </section>
+
+  <section class="my-14">
+    <h2 class="font-playfair text-3xl text-center mb-6">Razones por las que te Amo</h2>
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div class="card rounded-2xl p-5">
+        <div class="flex items-center gap-3 mb-2"><i class="fa-solid fa-star text-gold text-xl"></i><h3 class="font-playfair text-lg font-bold">Tu forma de ser</h3></div>
+        <p class="text-sm leading-relaxed">Tu ternura y tu manera de ver la vida hacen que mis días sean más bonitos.</p>
+      </div>
+      <div class="card rounded-2xl p-5">
+        <div class="flex items-center gap-3 mb-2"><i class="fa-solid fa-face-smile text-gold text-xl"></i><h3 class="font-playfair text-lg font-bold">Tu sonrisa</h3></div>
+        <p class="text-sm leading-relaxed">Una sola sonrisa tuya cambia por completo mi día.</p>
+      </div>
+      <div class="card rounded-2xl p-5">
+        <div class="flex items-center gap-3 mb-2"><i class="fa-solid fa-heart text-gold text-xl"></i><h3 class="font-playfair text-lg font-bold">Tu corazón</h3></div>
+        <p class="text-sm leading-relaxed">Eres noble, sincera y valiente. Me inspiras a ser mejor persona.</p>
+      </div>
+      <div class="card rounded-2xl p-5">
+        <div class="flex items-center gap-3 mb-2"><i class="fa-solid fa-house-heart text-gold text-xl"></i><h3 class="font-playfair text-lg font-bold">Tu compañía</h3></div>
+        <p class="text-sm leading-relaxed">Contigo me siento en casa, tranquilo y feliz.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="my-14">
+    <h2 class="font-playfair text-3xl text-center mb-6">Mis Promesas para Ti</h2>
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div class="card rounded-2xl p-5">
+        <div class="flex items-center gap-3 mb-2"><i class="fa-solid fa-ear-listen text-gold text-xl"></i><h3 class="font-playfair text-lg font-bold">Escucharte</h3></div>
+        <p class="text-sm leading-relaxed">Voy a escucharte con paciencia y atención, sin interrumpir ni minimizar lo que sientes.</p>
+      </div>
+      <div class="card rounded-2xl p-5">
+        <div class="flex items-center gap-3 mb-2"><i class="fa-solid fa-hand-holding-heart text-gold text-xl"></i><h3 class="font-playfair text-lg font-bold">Cuidar tus emociones</h3></div>
+        <p class="text-sm leading-relaxed">Voy a cuidar tus sentimientos y tu paz, midiendo mis palabras y mis actos.</p>
+      </div>
+      <div class="card rounded-2xl p-5">
+        <div class="flex items-center gap-3 mb-2"><i class="fa-solid fa-heart text-gold text-xl"></i><h3 class="font-playfair text-lg font-bold">Demostrarte mi amor cada día</h3></div>
+        <p class="text-sm leading-relaxed">Con detalles, palabras y presencia, no solo en los buenos momentos.</p>
+      </div>
+      <div class="card rounded-2xl p-5">
+        <div class="flex items-center gap-3 mb-2"><i class="fa-solid fa-seedling text-gold text-xl"></i><h3 class="font-playfair text-lg font-bold">Trabajar en mis errores</h3></div>
+        <p class="text-sm leading-relaxed">Voy a reconocer mis fallas, aprender de ellas y madurar por nosotros.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="text-center my-16 py-10 px-5 rounded-2xl bg-blush border border-gold/50">
+    <h2 class="font-dancing text-4xl md:text-5xl mb-3">¿Me das otra oportunidad?</h2>
+    <p class="mb-8 max-w-md mx-auto">Respeto tu decisión, sea cual sea. Elige con el corazón.</p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <button id="btnYes" class="btn btn-yes"><i class="fa-solid fa-heart mr-2"></i>Sí, te perdono</button>
+      <button id="btnWait" class="btn btn-wait"><i class="fa-regular fa-clock mr-2"></i>Aún necesito tiempo</button>
+    </div>
+  </section>
+</main>
+
+<button id="gear" class="fab" style="bottom:1rem;right:1rem" aria-label="Personalizar"><i class="fa-solid fa-gear"></i></button>
+<div id="panel" class="panel">
+  <h3 class="font-playfair text-lg mb-2">Personalización</h3>
+  <label>URL de Formspree o correo de destino
+    <input id="cfgForm" type="text" placeholder="https://formspree.io/f/TU_FORM_ID">
+  </label>
+  <button id="saveCfg" class="btn btn-yes w-full" style="padding:.6rem">Guardar</button>
+  <p id="cfgMsg" class="mt-2 text-xs"></p>
+</div>
+
+<div id="modalYes" class="modal"><div class="modal-box">
+  <i class="fa-solid fa-heart text-4xl text-gold"></i>
+  <h3 class="font-dancing text-5xl my-3">Gracias, mi amor</h3>
+  <p class="leading-relaxed mb-6">Gracias por darme otra oportunidad. Prometo cuidar tu corazón, escucharte y amarte cada día como mereces. Eres mi mayor bendición.</p>
+  <button class="btn btn-yes" data-close>Cerrar</button>
+</div></div>
+<div id="modalWait" class="modal"><div class="modal-box">
+  <i class="fa-regular fa-clock text-4xl text-gold"></i>
+  <h3 class="font-dancing text-5xl my-3">Tómate tu tiempo</h3>
+  <p class="leading-relaxed mb-6">Lo entiendo y lo respeto con madurez. Tu tranquilidad es lo más importante. Aquí estaré, esperándote con paciencia y todo mi amor.</p>
+  <button class="btn btn-yes" data-close>Cerrar</button>
+</div></div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+(function () {
+  'use strict';
+
+  // ====== CONFIGURA AQUÍ TU FORMSPREE (o desde el panel de engranaje) ======
+  var DEFAULT_FORM = 'https://formspree.io/f/maeebgjy';
+  var VIDEO_ID = '3eT464L1YRA'; // Bryan Adams - Heaven
+  // =========================================================================
+
+  var cfg = { form: DEFAULT_FORM };
+  try {
+    var saved = JSON.parse(localStorage.getItem('perdonCfg') || 'null');
+    if (saved && saved.form && saved.form.indexOf('TU_FORM_ID') === -1) cfg.form = saved.form;
+  } catch (e) {}
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- Pétalos ---------- */
+  for (var i = 0; i < 24; i++) {
+    var p = document.createElement('div');
+    var s = 10 + Math.random() * 14;
+    p.className = 'petal';
+    p.style.cssText = 'left:' + Math.random() * 100 + 'vw;width:' + s + 'px;height:' + s * 1.3 + 'px;' +
+      'animation-duration:' + (9 + Math.random() * 10) + 's;animation-delay:-' + Math.random() * 15 + 's;';
+    document.body.appendChild(p);
+  }
+
+  /* ---------- Música (YouTube IFrame API) ---------- */
+  var player = null, ready = false, playing = false, userToggled = false, wantPlay = false;
+
+  function updateMusicUI() {
+    $('musicBtn').innerHTML = playing ? '<i class="fa-solid fa-pause"></i>' : '<i class="fa-solid fa-play"></i>';
+    if (playing) $('banner').style.display = 'none';
+  }
+  window.onYouTubeIframeAPIReady = function () {
+    player = new YT.Player('ytPlayer', {
+      width: '200', height: '200', videoId: VIDEO_ID,
+      playerVars: { playsinline: 1, controls: 0, loop: 1, playlist: VIDEO_ID, rel: 0 },
+      events: {
+        onReady: function () { ready = true; if (wantPlay) player.playVideo(); },
+        onStateChange: function (e) {
+          if (useAudio) return;
+          playing = (e.data === YT.PlayerState.PLAYING);
+          updateMusicUI();
+        },
+        onError: function () { $('cfgMsg').textContent = 'No se pudo cargar la canción de YouTube.'; }
+      }
+    });
+  };
+  // Audio local: guarda la canción como heaven.mp3 junto a index.html.
+  // Si el archivo no existe, se usa YouTube como respaldo.
+  var audio = new Audio('heaven.mp3');
+  audio.loop = true;
+  audio.preload = 'auto';
+  var useAudio = true;
+  function fallbackToYouTube() {
+    useAudio = false;
+    if (wantPlay && ready) player.playVideo();
+  }
+  audio.addEventListener('error', fallbackToYouTube);
+  audio.addEventListener('playing', function () { playing = true; updateMusicUI(); });
+  audio.addEventListener('pause', function () { playing = false; updateMusicUI(); });
+
+  function startMusic() {
+    wantPlay = true;
+    if (useAudio) {
+      var pr = audio.play();
+      if (pr && pr.catch) pr.catch(fallbackToYouTube);
+    } else if (ready) {
+      player.playVideo();
+    }
+  }
+  function toggleMusic() {
+    userToggled = true;
+    if (playing) {
+      wantPlay = false;
+      audio.pause();
+      if (ready) player.pauseVideo();
+    } else startMusic();
+  }
+  $('banner').addEventListener('click', function (e) { e.stopPropagation(); userToggled = true; startMusic(); });
+  $('musicBtn').addEventListener('click', function (e) { e.stopPropagation(); toggleMusic(); });
+  // Clic en cualquier parte de la pantalla activa la música (solo la primera vez)
+  document.addEventListener('click', function (e) {
+    if (userToggled || playing) return;
+    if (e.target.closest('#panel') || e.target.closest('#gear')) return;
+    userToggled = true;
+    startMusic();
+  });
+
+  /* ---------- Panel ---------- */
+  $('cfgForm').value = cfg.form;
+  $('gear').addEventListener('click', function (e) { e.stopPropagation(); $('panel').classList.toggle('show'); });
+  $('saveCfg').addEventListener('click', function () {
+    cfg.form = $('cfgForm').value.trim() || DEFAULT_FORM;
+    try { localStorage.setItem('perdonCfg', JSON.stringify(cfg)); } catch (e) {}
+    $('cfgMsg').textContent = 'Guardado.';
+  });
+
+  /* ---------- Notificación por correo (Formspree) ---------- */
+  function notify(answer) {
+    var now = new Date();
+    var when = now.toLocaleString('es-GT', { dateStyle: 'full', timeStyle: 'medium' });
+    var target = cfg.form;
+    if (target.indexOf('TU_FORM_ID') !== -1) {
+      $('cfgMsg').textContent = 'Falta tu ID de Formspree: no se envió el correo.';
+      return Promise.resolve(false);
+    }
+    var isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(target);
+    var url = isEmail ? 'https://formspree.io/' + encodeURIComponent(target) : target;
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject: 'Respuesta de tu princesa: ' + answer,
+        respuesta: answer,
+        fecha_hora: when,
+        iso: now.toISOString()
+      })
+    }).then(function (r) { return r.ok; }).catch(function () { return false; });
+  }
+
+  /* ---------- Confeti y corazones ---------- */
+  function celebrate() {
+    var colors = ['#D4AF37', '#F8C8DC', '#c9577c', '#6B2D3E', '#FCE7F0'];
+    for (var i = 0; i < 90; i++) {
+      var el = document.createElement('div');
+      el.className = 'fx';
+      var dur = 2.5 + Math.random() * 2.5;
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.setProperty('--dx', (Math.random() * 200 - 100) + 'px');
+      el.style.animationDuration = dur + 's';
+      el.style.animationDelay = Math.random() * 0.8 + 's';
+      if (i % 3 === 0) {
+        el.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        el.style.color = colors[Math.floor(Math.random() * 3) + 1];
+        el.style.fontSize = (14 + Math.random() * 16) + 'px';
+      } else {
+        el.style.width = '9px'; el.style.height = '14px';
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+      }
+      document.body.appendChild(el);
+      setTimeout(function (e) { return function () { e.remove(); }; }(el), (dur + 1) * 1000);
+    }
+  }
+
+  /* ---------- Botones de respuesta ---------- */
+  function respond(btn, answer, modalId, withConfetti) {
+    btn.addEventListener('click', function () {
+      $('btnYes').disabled = true; $('btnWait').disabled = true;
+      notify(answer);
+      if (withConfetti) celebrate();
+      $(modalId).classList.add('show');
+      setTimeout(function () { $('btnYes').disabled = false; $('btnWait').disabled = false; }, 2000);
+    });
+  }
+  respond($('btnYes'), 'Sí, te perdono', 'modalYes', true);
+  respond($('btnWait'), 'Aún necesito tiempo', 'modalWait', false);
+
+  document.querySelectorAll('[data-close]').forEach(function (b) {
+    b.addEventListener('click', function () { b.closest('.modal').classList.remove('show'); });
+  });
+})();
+</script>
+</body>
+</html>
